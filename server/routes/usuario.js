@@ -20,7 +20,7 @@ app.get('/usuario', (req, res) => {
     let limite = req.query.limite || 5;
     limite = Number(limite);
 
-    Usuario.find({})
+    Usuario.find({ estado: true }, 'nombre email role estado')
         .skip(desde)
         .limit(limite)
         .exec((err, usuarios) => {
@@ -30,7 +30,7 @@ app.get('/usuario', (req, res) => {
                     err
                 });
             }
-            Usuario.count({}, (err, conteo) => {
+            Usuario.count({ estado: true }, (err, conteo) => {
                 res.json({
                     ok: true,
                     registros: conteo,
@@ -78,18 +78,19 @@ app.put('/usuario/:id', (req, res) => {
     //delete body.password;
     //delete body.google;
 
-    Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true, context: 'query' }, (err, usuarioDB) => {
+    Usuario.findByIdAndUpdate(id, body, { new: true, runValidators: true, context: 'query' }, (err, usuarioBD) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
                 err
             });
         }
+        res.json({
+            ok: true,
+            usuario: usuarioBD
+        });
     });
-    res.json({
-        ok: true,
-        usuario: usuarioDB
-    });
+
     /*if (body.nombre === undefined) {
         res.status(400), json({
             mensaje: "El nombre es necesario"
@@ -102,9 +103,57 @@ app.put('/usuario/:id', (req, res) => {
 
 });
 
-app.delete('/usuario', (req, res) => {
+app.delete('/usuario/:id', (req, res) => {
     /** ELIMINAR REGISTRO (CAMBIAR A INACTIVO) */
-    res.json('delete Usuario');
+    //res.json('delete Usuario');
+    let id = req.params.id;
+    let cambiaEstado = {
+        estado: false
+    }
+    Usuario.findByIdAndUpdate(id, cambiaEstado, { new: true }, (err, usuarioBD) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+        if (usuarioBD === null) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: "Usuario no encontrado"
+                }
+
+            });
+        }
+        res.json({
+            ok: true,
+            usuario: usuarioBD
+        });
+    });
+
+    /*Usuario.findByIdAndDelete(id, (err, usuarioBorrado) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+        if (usuarioBorrado === null) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: "Usuario no encontrado"
+                }
+
+            });
+        }
+        res.json({
+            ok: true,
+            usuario: usuarioBorrado
+        });
+    });
+    */
 });
 
 //exportar para que se pueda utilizar otros modulos.

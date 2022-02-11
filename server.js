@@ -19,12 +19,13 @@ app.use(bodyParser.json())
 app.use(require('./server/routes/usuario'));
 
 /*CONEXION CON BDD*/
-mongoose.connect('mongodb://localhost:27017', (err, res) => {
-    if (err) {
-        throw err;
-    }
-    console.log("Base de datos ON LINE");
-});
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true },
+    (err, res) => {
+        if (err) {
+            throw err;
+        }
+        console.log("Base de datos ON LINE");
+    });
 
 
 app.listen(process.env.PORT, () => {
