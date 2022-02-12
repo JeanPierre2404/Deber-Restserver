@@ -5,7 +5,7 @@ let Schema = mongoose.Schema;
 
 let rolesValidos = {
     values: ['ADMIN_ROLE', 'USER_ROLE'],
-    message: '{VALUES} nos es un rol Valido'
+    message: '{VALUE} no es un rol válido'
 }
 
 let usuarioSchema = new Schema({
@@ -23,7 +23,7 @@ let usuarioSchema = new Schema({
         required: [true, 'El password es requerido']
     },
     img: {
-        type: String,
+        trype: String,
         required: false
     },
     role: {
@@ -41,14 +41,14 @@ let usuarioSchema = new Schema({
     }
 });
 
-usuarioSchema.plugin(uniqueValidator, { message: '{PATH} debe ser único' });
+usuarioSchema.plugin(uniqueValidator, { message: '{PATH} debe ser unico' });
 
 usuarioSchema.methods.toJSON = function() {
     let user = this;
     let userObject = user.toObject();
     delete userObject.password;
-
     return userObject;
 };
 
+//permite exportar el archivo, para que este disponible en toda la aplicacion
 module.exports = mongoose.model('Usuario', usuarioSchema);
